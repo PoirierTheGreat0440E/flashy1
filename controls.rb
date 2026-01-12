@@ -123,6 +123,7 @@ class ControlZone < FXVerticalFrame
    elsif data.code == KEY_space
      # We add a vertex...
      self.add_vertex(@Cd.target_point)
+     self.getParent().getParent().process_vertex_manip(@vertex_array)
    else
    end
    @Cd.update_labels

@@ -9,15 +9,20 @@ include GLU
 
 class Canvas3D < FXGLCanvas
 
-    attr_reader :visuel, :camera
+    attr_reader :visuel, :camera, :vertex_array
 
     def initialize(application,parent)
       @visuel = FXGLVisual.new(application,VISUAL_STEREO)
       super(parent,@visuel,:opts=>LAYOUT_FILL)
       self.connect(SEL_PAINT,method(:on_paint))
       #self.connect(SEL_MOTION,method(:on_motion))
+      @vertex_array = []
       @camera = Polar.new(3,0,0) 
       @cursor = Point.new(0,0,0)
+    end
+
+    def set_vertices_array(array)
+      @vertex_array = array
     end
     
     def set_camera_coordinates(camera_coords)
@@ -30,6 +35,15 @@ class Canvas3D < FXGLCanvas
       @cursor.pos_x = cursor.pos_x
       @cursor.pos_y = cursor.pos_y
       @cursor.pos_z = cursor.pos_z
+    end
+
+    def display_vertices()
+      glBegin(GL_QUADS)
+      glColor3f(1.0,0.0,1.0)
+      @vertex_array.each do |element|
+        glVertex3f(element.pos_x,element.pos_y,element.pos_z)
+      end
+      glEnd()
     end
 
     def on_paint(sender,sel,data)
@@ -54,6 +68,7 @@ class Canvas3D < FXGLCanvas
              1.0,
              0.0)
 
+
       glBegin(GL_LINES)
       glColor3f(1.0,0.0,0.0)
       glVertex3f(0.0,0.0,0.0)
@@ -72,6 +87,9 @@ class Canvas3D < FXGLCanvas
       glColor3f(1.0,1.0,1.0)
       glVertex3f(@cursor.pos_x,@cursor.pos_y,@cursor.pos_z)
       glEnd()
+
+
+      self.display_vertices()
 
 
       glMatrixMode(GL_PROJECTION)

@@ -67,6 +67,10 @@ class Fenetre_principale < FXMainWindow
     @visuals.recalc
   end
 
+  def process_vertex_manip(list)
+    @visuals.set_vertices_array(list)
+  end
+
 end
 
 application = FXApp.new
