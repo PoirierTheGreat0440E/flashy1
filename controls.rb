@@ -41,19 +41,47 @@ end
 
 class ControlZone < FXVerticalFrame
 
-  attr_reader :camera
+  attr_reader :camera ,:vertex_array
 
  def initialize(parent,opts)
     super(parent,opts)
     @parent = parent
-    @camera = Polar.new(1,0,0)
-    # The first sub-zone contains buttons
+
+    # The cursor gets its coordinates shown by a CoordinatesDisplayer
     @Cd = CoordinatesDisplayer.new(self,Point.new(0,0,0))
+
+    # Same goes for the camera (which uses polar coordinates for the moment)
     @Cd_camera = CoordinatesDisplayer.new(self,Polar.new(1,0,0))
-    # The second one consists of a list
-    # This list is gonna store every vertex
+
+    # Every vertex inserted will be stored in this array.
+    @vertex_array = []
+
+    # This FXList is coupled with the vertex_array to show them to the user
+    # and allow the user to interact more naturally with them.
     @vertex_list = FXList.new(self,:opts=>LIST_EXTENDEDSELECT|LAYOUT_FILL)
     @vertex_list.connect(SEL_KEYPRESS,method(:on_keypress))
+
+ end
+
+ def add_vertex(cursor,index="Creeper")
+   if index == "Creeper"
+     @vertex_array << cursor.clone
+   elsif index.class.to_s == "Integer" and index >= 0
+     @vertex_array.insert(index,cursor)
+   end
+   self.update_vertex_list
+ end
+
+ def delete_vertex(index)
+   @vertex_array.delete_at(index)
+   self.update_vertex_list
+ end
+
+ def update_vertex_list()
+   @vertex_list.clearItems
+   @vertex_array.each do |element|
+     @vertex_list.appendItem(element.to_s)
+   end
  end
 
 
@@ -93,7 +121,8 @@ class ControlZone < FXVerticalFrame
    elsif data.code == KEY_d
      @Cd.target_point.pos_z -= 0.2
    elsif data.code == KEY_space
-     puts "SPACE"
+     # We add a vertex...
+     self.add_vertex(@Cd.target_point)
    else
    end
    @Cd.update_labels

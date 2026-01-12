@@ -27,6 +27,10 @@ class Point
     @pos_z = z
   end
 
+  def to_s()
+    return "X: #{@pos_x.round(2)} Y: #{@pos_y.round(2)} Z: #{@pos_z.round(2)}"
+  end
+
 end
 
 class Polar < Point
