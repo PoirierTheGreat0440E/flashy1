@@ -61,6 +61,9 @@ class ControlZone < FXVerticalFrame
     @vertex_list = FXList.new(self,:opts=>LIST_EXTENDEDSELECT|LAYOUT_FILL)
     @vertex_list.connect(SEL_KEYPRESS,method(:on_keypress))
 
+    # Now we create a second packer that's gonna be a HorizontalFrame...
+    @details_zone = FXHorizontalFrame.new(self,LAYOUT_FILL|FRAME_GROOVE)
+
  end
 
  def add_vertex(cursor,index="Creeper")
