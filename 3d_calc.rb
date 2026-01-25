@@ -174,3 +174,49 @@ def demo1
   orthogonal1 = vecteur1.X(vecteur2)
   puts "RES : #{vecteur1.dot(orthogonal1).round()}"
 end
+
+
+class Plane
+
+  attr_reader :p1 , :p2 , :p3 , :p4 , :length_1_to_2 , :length_2_to_3, :length_3_to_4, :length_4_to_1
+
+  def initialize(point1,point2,point3,point4)
+    @p1 = point1
+    @p2 = point2
+    @p3 = point3
+    @p4 = point4
+    @length_1_to_2 = Vector.new(@p1,@p2).length
+    @length_2_to_3 = Vector.new(@p2,@p3).length
+    @length_3_to_4 = Vector.new(@p3,@p4).length
+    @length_4_to_1 = Vector.new(@p4,@p1).length
+  end
+
+  def p1=(new_p1)
+    @p1 = new_p1
+    self.update_lengths
+  end
+
+  def p2=(new_p1)
+    @p2 = new_p1
+    self.update_lengths
+  end
+
+  def p3=(new_p1)
+    @p3 = new_p1
+    self.update_lengths
+  end
+
+  def p4=(new_p1)
+    @p4 = new_p1
+    self.update_lengths
+  end
+
+  def update_lengths()
+    @length_1_to_2 = Vector.new(@p1,@p2).length
+    @length_2_to_3 = Vector.new(@p2,@p3).length
+    @length_3_to_4 = Vector.new(@p3,@p4).length
+    @length_4_to_1 = Vector.new(@p4,@p1).length
+  end
+
+
+end

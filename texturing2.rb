@@ -11,8 +11,23 @@ class TextureManipulator < FXCanvas
   def initialize(parent,application)
     super(parent,:opts=>LAYOUT_FILL|FRAME_LINE)
     self.connect(SEL_PAINT,method(:on_paint))
+    self.connect(SEL_MOTION,method(:on_motion))
+    self.connect(SEL_ENTER,method(:on_enter))
+    self.connect(SEL_LEAVE,method(:on_leave))
+    self.connect(SEL_LEFTBUTTONPRESS,method(:on_leftbuttonpress))
     @app = application
     @image = load_image("apple.jpeg")
+    @cursor_in = false
+  end
+
+  def paint(data)
+    FXDCWindow.new(self,data) do |dc|
+      dc.foreground = self.backColor
+      dc.drawImage(@image,0,0)
+      if @cursor_in == true
+        puts "CURSOR IN !"
+      end
+    end 
   end
   
   def load_image(new_image)
@@ -25,10 +40,23 @@ class TextureManipulator < FXCanvas
   end
 
   def on_paint(sender,sel,data)
-    FXDCWindow.new(self,data) do |dc|
-      dc.foreground = self.backColor
-      dc.drawImage(@image,0,0)
-    end
+    self.paint(data)
+  end
+
+  def on_motion(sender,sel,data)
+    #puts "SOURIS : X:#{data.win_x} et Y:#{data.win_y}"
+  end
+
+  def on_enter(sender,sel,data)
+    @cursor_in = true
+  end
+
+  def on_leave(sender,sel,data)
+    @cursor_in = false
+  end
+
+  def on_leftbuttonpress(sender,sel,data)
+    puts "ahi!"
   end
 
 end
