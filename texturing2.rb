@@ -4,7 +4,7 @@ load '3d_visual.rb'
 load 'controls.rb'
 include Fox
 
-class TextureManipulator < FXCanvas
+class TexViewer < FXCanvas
 
   attr_reader :app ,:target_image
   
@@ -12,30 +12,27 @@ class TextureManipulator < FXCanvas
     super(parent,:opts=>LAYOUT_FILL|FRAME_LINE)
     self.connect(SEL_PAINT,method(:on_paint))
     self.connect(SEL_MOTION,method(:on_motion))
-    self.connect(SEL_ENTER,method(:on_enter))
-    self.connect(SEL_LEAVE,method(:on_leave))
+    self.connect(SEL_CONFIGURE,method(:on_configure))
     self.connect(SEL_LEFTBUTTONPRESS,method(:on_leftbuttonpress))
     @app = application
-    @image = load_image("apple.jpeg")
-    @cursor_in = false
+    @image = load_image("apple.jpeg",100,200)
   end
 
   def paint(data)
     FXDCWindow.new(self,data) do |dc|
       dc.foreground = self.backColor
+      dc.fillRectangle(0,0,self.width,self.height)
       dc.drawImage(@image,0,0)
-      if @cursor_in == true
-        puts "CURSOR IN !"
-      end
     end 
   end
   
-  def load_image(new_image)
+  def load_image(new_image,new_width,new_height)
     resultat = nil
     resultat = FXJPGImage.new(@app,nil,IMAGE_KEEP)
     FXFileStream.open(new_image,FXStreamLoad) { |stream| resultat.loadPixels(stream) }
-    resultat.scale(1024,1024)
+    resultat.scale(new_width,new_height)
     resultat.create
+    self.getParent().resize(new_width,new_height)
     return resultat
   end
 
@@ -47,16 +44,29 @@ class TextureManipulator < FXCanvas
     #puts "SOURIS : X:#{data.win_x} et Y:#{data.win_y}"
   end
 
-  def on_enter(sender,sel,data)
-    @cursor_in = true
-  end
-
-  def on_leave(sender,sel,data)
-    @cursor_in = false
-  end
-
   def on_leftbuttonpress(sender,sel,data)
     puts "ahi!"
+  end
+
+  def on_configure(sender,sel,data)
+    puts "Width : #{self.width} Height : #{self.height}"
+  end
+
+end
+
+
+class TextureManipulator < FXHorizontalFrame
+
+# The texture manipulator allows the user to place texels coordinates
+# on an image and load the image into a canvas to make the process easier.
+#
+# On its left is going to be the TexViewer, which is basically a canvas
+# On its right is a control panel with buttons and options to use at your liking.
+
+  def initialize(parent)
+    super(parent,LAYOUT_FILL|FRAME_THICK|PACK_UNIFORM_WIDTH)
+    @tex_viewer = TexViewer.new(self,self.getApp())
+    @control_panel = FXVerticalFrame.new(self,LAYOUT_FILL|FRAME_GROOVE)
   end
 
 end
@@ -71,7 +81,7 @@ class Fenetre_principale < FXMainWindow
     super(application,"App1",nil,nil,DECOR_ALL,10,10,770,500)
     @application = application
     self.connect(SEL_CLOSE,method(:on_close))
-    @texmanip = TextureManipulator.new(self,@application)
+    @texmanip = TextureManipulator.new(self)
   end
 
   def create

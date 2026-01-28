@@ -196,18 +196,18 @@ class Plane
     self.update_lengths
   end
 
-  def p2=(new_p1)
-    @p2 = new_p1
+  def p2=(new_p2)
+    @p2 = new_p2
     self.update_lengths
   end
 
-  def p3=(new_p1)
-    @p3 = new_p1
+  def p3=(new_p3)
+    @p3 = new_p3
     self.update_lengths
   end
 
-  def p4=(new_p1)
-    @p4 = new_p1
+  def p4=(new_p4)
+    @p4 = new_p4
     self.update_lengths
   end
 
