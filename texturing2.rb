@@ -6,67 +6,50 @@ include Fox
 
 class TexViewer < FXCanvas
 
-  attr_reader :app ,:target_image
+  attr_reader :texture
   
   def initialize(parent,application)
-    super(parent,:opts=>LAYOUT_FILL|FRAME_LINE)
+    super(parent,:opts=>LAYOUT_FILL)
     self.connect(SEL_PAINT,method(:on_paint))
     self.connect(SEL_MOTION,method(:on_motion))
-    self.connect(SEL_CONFIGURE,method(:on_configure))
     self.connect(SEL_LEFTBUTTONPRESS,method(:on_leftbuttonpress))
-    @app = application
-    @image = load_image("apple.jpeg",100,200)
+    @image = load_image("apple.jpeg",1024,1024)
+    @cursor_positions = [0,0]
+    @point_list = Array.new()
   end
 
-  def paint(data)
-    FXDCWindow.new(self,data) do |dc|
-      dc.foreground = self.backColor
+  def paint()
+    FXDCWindow.new(self) do |dc|
+      dc.foreground = FXRGB(0,0,0)
       dc.fillRectangle(0,0,self.width,self.height)
       dc.drawImage(@image,0,0)
+      dc.drawRectangle(@cursor_positions[0]-10,@cursor_positions[1]-10,20,20)
+      @point_list.each do |point|
+        dc.drawPoint(point[0],point[1])
+      end
     end 
   end
   
   def load_image(new_image,new_width,new_height)
     resultat = nil
-    resultat = FXJPGImage.new(@app,nil,IMAGE_KEEP)
+    resultat = FXJPGImage.new(self.getApp(),nil,IMAGE_KEEP)
     FXFileStream.open(new_image,FXStreamLoad) { |stream| resultat.loadPixels(stream) }
     resultat.scale(new_width,new_height)
     resultat.create
-    self.getParent().resize(new_width,new_height)
     return resultat
   end
 
   def on_paint(sender,sel,data)
-    self.paint(data)
+    self.paint()
   end
 
   def on_motion(sender,sel,data)
-    #puts "SOURIS : X:#{data.win_x} et Y:#{data.win_y}"
+    @cursor_positions = [ data.win_x , data.win_y ]
+    puts @cursor_positions.to_s
   end
 
   def on_leftbuttonpress(sender,sel,data)
-    puts "ahi!"
-  end
-
-  def on_configure(sender,sel,data)
-    puts "Width : #{self.width} Height : #{self.height}"
-  end
-
-end
-
-
-class TextureManipulator < FXHorizontalFrame
-
-# The texture manipulator allows the user to place texels coordinates
-# on an image and load the image into a canvas to make the process easier.
-#
-# On its left is going to be the TexViewer, which is basically a canvas
-# On its right is a control panel with buttons and options to use at your liking.
-
-  def initialize(parent)
-    super(parent,LAYOUT_FILL|FRAME_THICK|PACK_UNIFORM_WIDTH)
-    @tex_viewer = TexViewer.new(self,self.getApp())
-    @control_panel = FXVerticalFrame.new(self,LAYOUT_FILL|FRAME_GROOVE)
+    @point_list.push([data.win_x,data.win_y])
   end
 
 end
@@ -75,13 +58,12 @@ end
 
 class Fenetre_principale < FXMainWindow
 
-  attr_reader :center , :canvas_zone , :control_zone , :zone1
+  attr_reader :texview
 
   def initialize(application)
-    super(application,"App1",nil,nil,DECOR_ALL,10,10,770,500)
-    @application = application
+    super(application,"Texturing demo",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024)
     self.connect(SEL_CLOSE,method(:on_close))
-    @texmanip = TextureManipulator.new(self)
+    @texview = TexViewer.new(self,self.getApp())
   end
 
   def create
@@ -90,15 +72,16 @@ class Fenetre_principale < FXMainWindow
   end
 
   def on_close(sender,sel,data)
-    puts "Ay chingas !"
     self.close
   end
 
 end
 
+
+
 application = FXApp.new
 fenetre = Fenetre_principale.new(application) 
-#application.addTimeout(100,:repeat=>true) { fenetre.update }
 application.create
+application.addTimeout(10,:repeat=>true) { fenetre.texview.paint() }
 fenetre.show
 application.run
