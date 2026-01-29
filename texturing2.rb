@@ -13,9 +13,17 @@ class TexViewer < FXCanvas
     self.connect(SEL_PAINT,method(:on_paint))
     self.connect(SEL_MOTION,method(:on_motion))
     self.connect(SEL_LEFTBUTTONPRESS,method(:on_leftbuttonpress))
+    @cell_size = 1
     @image = load_image("apple.jpeg",1024,1024)
     @cursor_positions = [0,0]
     @point_list = Array.new()
+  end
+
+  def place_grid_cell(dc,x,y)
+    dc.drawRectangle( (x/@cell_size)*@cell_size - @cell_size/2,
+                     (y/@cell_size)*@cell_size - @cell_size/2 ,
+                     @cell_size,
+                     @cell_size)
   end
 
   def paint()
@@ -23,9 +31,9 @@ class TexViewer < FXCanvas
       dc.foreground = FXRGB(0,0,0)
       dc.fillRectangle(0,0,self.width,self.height)
       dc.drawImage(@image,0,0)
-      dc.drawRectangle(@cursor_positions[0]-10,@cursor_positions[1]-10,20,20)
+      self.place_grid_cell(dc,@cursor_positions[0],@cursor_positions[1])
       @point_list.each do |point|
-        dc.drawPoint(point[0],point[1])
+        self.place_grid_cell(dc,point[0],point[1])
       end
     end 
   end
@@ -34,6 +42,8 @@ class TexViewer < FXCanvas
     resultat = nil
     resultat = FXJPGImage.new(self.getApp(),nil,IMAGE_KEEP)
     FXFileStream.open(new_image,FXStreamLoad) { |stream| resultat.loadPixels(stream) }
+    #puts "Initial shape : W=#{resultat.width} H=#{resultat.height}"
+    @cell_size = (new_width/(resultat.width)).to_int
     resultat.scale(new_width,new_height)
     resultat.create
     return resultat
