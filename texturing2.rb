@@ -74,9 +74,13 @@ class TextureSelector < FXHorizontalFrame
   #
   # On the right is the file selector that only cares about .jpg/.jpeg files (for now)
 
+  attr_reader :preview_image, :previewer, :file_selector
+
   def initialize(parent)
 
     super(parent,:opts=>LAYOUT_FILL|PACK_UNIFORM_WIDTH|FRAME_LINE)
+
+    @preview_image = nil
 
     @previewer = FXCanvas.new(self,:opts=>LAYOUT_FILL)
     @previewer.connect(SEL_PAINT,method(:on_paint))
@@ -90,6 +94,8 @@ class TextureSelector < FXHorizontalFrame
 
   def on_accept(sender,sel,data)
     puts "what???"
+    @preview_image = self.load_preview_image(@file_selector.filename)
+    self.paint
   end
 
   def on_cancel(sender,sel,data)
@@ -97,9 +103,30 @@ class TextureSelector < FXHorizontalFrame
   end
 
   def on_paint(sender,sel,data)
+    self.paint
   end
 
-  def load_preview_image(sender,sel,data)
+  def load_preview_image(new_image)
+    resultat = nil
+    resultat = FXJPGImage.new(self.getApp(),nil,IMAGE_KEEP)
+    FXFileStream.open(new_image,FXStreamLoad) { |stream| resultat.loadPixels(stream) }
+    resultat.scale(@previewer.width,@previewer.height)
+    resultat.create
+    return resultat
+  end
+
+  def paint()
+    FXDCWindow.new(@previewer) do |dc|
+      dc.foreground = FXRGB(255,0,0)
+      dc.fillRectangle(0,0,@previewer.width,@previewer.height)
+      if @preview_image
+        dc.drawImage(@preview_image,0,0) 
+      end
+    end
+  end
+
+  def onCmdItemSelected(sender,sel,data)
+    puts "BOUGNADERE"
   end
 
 end
@@ -107,7 +134,7 @@ end
 
 class Fenetre_principale < FXMainWindow
 
-  attr_reader :texview
+  attr_reader :texview, :selector
 
   def initialize(application)
     #super(application,"Texturing demo",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024)
@@ -134,5 +161,6 @@ application = FXApp.new
 fenetre = Fenetre_principale.new(application) 
 application.create
 #application.addTimeout(10,:repeat=>true) { fenetre.texview.paint() }
+application.addTimeout(10,:repeat=>true) { fenetre.selector.paint() }
 fenetre.show
 application.run
