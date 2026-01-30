@@ -65,15 +65,56 @@ class TexViewer < FXCanvas
 end
 
 
+class TextureSelector < FXHorizontalFrame
+
+  # The texture selector allows the user to select a jpg/jpeg image
+  # so that he can place texel coordinates on the TexViewer.
+  #
+  # On the left is gonna be a preview of the selected image
+  #
+  # On the right is the file selector that only cares about .jpg/.jpeg files (for now)
+
+  def initialize(parent)
+
+    super(parent,:opts=>LAYOUT_FILL|PACK_UNIFORM_WIDTH|FRAME_LINE)
+
+    @previewer = FXCanvas.new(self,:opts=>LAYOUT_FILL)
+    @previewer.connect(SEL_PAINT,method(:on_paint))
+
+    @file_selector = FXFileSelector.new(self,nil,SELECTFILE_EXISTING,LAYOUT_FILL_X)
+    @file_selector.setPatternList( ["*.jpeg","*.jpg"] )
+    @file_selector.acceptButton.connect(SEL_COMMAND,method(:on_accept))
+    @file_selector.cancelButton.connect(SEL_COMMAND,method(:on_cancel))
+
+  end
+
+  def on_accept(sender,sel,data)
+    puts "what???"
+  end
+
+  def on_cancel(sender,sel,data)
+    puts "ayo..."
+  end
+
+  def on_paint(sender,sel,data)
+  end
+
+  def load_preview_image(sender,sel,data)
+  end
+
+end
+
 
 class Fenetre_principale < FXMainWindow
 
   attr_reader :texview
 
   def initialize(application)
-    super(application,"Texturing demo",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024)
+    #super(application,"Texturing demo",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024)
+    super(application,"Texturing demo",nil,nil,DECOR_ALL,10,10,700,300)
     self.connect(SEL_CLOSE,method(:on_close))
-    @texview = TexViewer.new(self,self.getApp())
+    #@texview = TexViewer.new(self,self.getApp())
+    @selector = TextureSelector.new(self)
   end
 
   def create
@@ -92,6 +133,6 @@ end
 application = FXApp.new
 fenetre = Fenetre_principale.new(application) 
 application.create
-application.addTimeout(10,:repeat=>true) { fenetre.texview.paint() }
+#application.addTimeout(10,:repeat=>true) { fenetre.texview.paint() }
 fenetre.show
 application.run
