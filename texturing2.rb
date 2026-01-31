@@ -4,6 +4,34 @@ load '3d_visual.rb'
 load 'controls.rb'
 include Fox
 
+class TexWindow < FXTopWindow
+
+  attr_reader :pecker, :texviewer
+
+  def initialize(parent)
+    super(parent,"Texture1",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024,0,0,0,0,0,0)
+    self.connect(SEL_CLOSE,method(:on_close))
+    @pecker = FXPacker.new(self,LAYOUT_FILL)
+    @texviewer = TexViewer.new(@pecker,self.getApp)
+  end
+
+  def show_yourself(image_path)
+    @texviewer.load_image(image_path,self.width,self.height)
+    self.show(PLACEMENT_DEFAULT)
+  end
+
+  def on_close(sender,sel,event)
+    self.hide
+  end
+
+  def painting()
+      @texviewer.paint
+  end
+
+end
+
+
+
 class TexViewer < FXCanvas
 
   attr_reader :texture
@@ -14,7 +42,8 @@ class TexViewer < FXCanvas
     self.connect(SEL_MOTION,method(:on_motion))
     self.connect(SEL_LEFTBUTTONPRESS,method(:on_leftbuttonpress))
     @cell_size = 1
-    @image = load_image("apple.jpeg",1024,1024)
+    @image = nil
+    load_image("apple.jpeg",1024,1024)
     @cursor_positions = [0,0]
     @point_list = Array.new()
   end
@@ -46,7 +75,7 @@ class TexViewer < FXCanvas
     @cell_size = (new_width/(resultat.width)).to_int
     resultat.scale(new_width,new_height)
     resultat.create
-    return resultat
+    @image = resultat
   end
 
   def on_paint(sender,sel,data)
@@ -65,6 +94,7 @@ class TexViewer < FXCanvas
 end
 
 
+
 class TextureSelector < FXHorizontalFrame
 
   # The texture selector allows the user to select a jpg/jpeg image
@@ -74,14 +104,13 @@ class TextureSelector < FXHorizontalFrame
   #
   # On the right is the file selector that only cares about .jpg/.jpeg files (for now)
 
-  attr_reader :preview_image, :previewer, :file_selector
+  attr_reader :preview_image, :previewer, :file_selector, :texWindow
 
   def initialize(parent)
 
     super(parent,:opts=>LAYOUT_FILL|PACK_UNIFORM_WIDTH|FRAME_LINE)
 
     @preview_image = nil
-
     @previewer = FXCanvas.new(self,:opts=>LAYOUT_FILL)
     @previewer.connect(SEL_PAINT,method(:on_paint))
 
@@ -89,6 +118,9 @@ class TextureSelector < FXHorizontalFrame
     @file_selector.setPatternList( ["*.jpeg","*.jpg"] )
     @file_selector.acceptButton.connect(SEL_COMMAND,method(:on_accept))
     @file_selector.cancelButton.connect(SEL_COMMAND,method(:on_cancel))
+    
+    # The window is shown whenever we double click the image/accept it.
+    @texWindow = TexWindow.new(self)
 
   end
 
@@ -96,6 +128,8 @@ class TextureSelector < FXHorizontalFrame
     puts "what???"
     @preview_image = self.load_preview_image(@file_selector.filename)
     self.paint
+    @texWindow.show_yourself(@file_selector.filename)
+    #puts @file_selector.filename
   end
 
   def on_cancel(sender,sel,data)
@@ -132,15 +166,14 @@ class TextureSelector < FXHorizontalFrame
 end
 
 
+
 class Fenetre_principale < FXMainWindow
 
   attr_reader :texview, :selector
 
   def initialize(application)
-    #super(application,"Texturing demo",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024)
     super(application,"Texturing demo",nil,nil,DECOR_ALL,10,10,700,300)
     self.connect(SEL_CLOSE,method(:on_close))
-    #@texview = TexViewer.new(self,self.getApp())
     @selector = TextureSelector.new(self)
   end
 
@@ -162,5 +195,6 @@ fenetre = Fenetre_principale.new(application)
 application.create
 #application.addTimeout(10,:repeat=>true) { fenetre.texview.paint() }
 application.addTimeout(10,:repeat=>true) { fenetre.selector.paint() }
+application.addTimeout(10,:repeat=>true) { fenetre.selector.texWindow.painting }
 fenetre.show
 application.run
