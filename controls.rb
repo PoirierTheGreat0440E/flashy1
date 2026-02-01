@@ -39,6 +39,8 @@ class CoordinatesDisplayer < FXHorizontalFrame
   
 end
 
+
+
 class ControlZone < FXVerticalFrame
 
   attr_reader :camera ,:vertex_array
@@ -86,6 +88,7 @@ class ControlZone < FXVerticalFrame
      @vertex_list.appendItem(element.to_s)
    end
  end
+
 
 
  # Callback function to interact with the keyboard
