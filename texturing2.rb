@@ -190,11 +190,11 @@ end
 
 
 
-application = FXApp.new
-fenetre = Fenetre_principale.new(application) 
-application.create
+#application = FXApp.new
+#fenetre = Fenetre_principale.new(application) 
+#application.create
 #application.addTimeout(10,:repeat=>true) { fenetre.texview.paint() }
-application.addTimeout(10,:repeat=>true) { fenetre.selector.paint() }
-application.addTimeout(10,:repeat=>true) { fenetre.selector.texWindow.painting }
-fenetre.show
-application.run
+#application.addTimeout(10,:repeat=>true) { fenetre.selector.paint() }
+#application.addTimeout(10,:repeat=>true) { fenetre.selector.texWindow.painting }
+#fenetre.show
+#application.run

@@ -142,8 +142,8 @@ end
 
 
 
-application = FXApp.new("VertexList DEMO")
-mainWindow = MainWindow.new(application)
-application.create
-mainWindow.show
-application.run
+#application = FXApp.new("VertexList DEMO")
+#mainWindow = MainWindow.new(application)
+#application.create
+#mainWindow.show
+#application.run
