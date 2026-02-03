@@ -39,11 +39,12 @@ class Lister < FXHorizontalFrame
     @list_vertex.connect(SEL_COMMAND,method(:on_command))
 
     # The list for the quads
-    @list_quad = FXList.new(self,nil,0,LAYOUT_FILL|LIST_SINGLESELECT)
-    @list_quad.setSelBackColor(FXRGB(0,255,0))
+    @list_quad = FXList.new(self,nil,0,LAYOUT_FILL)
+    @list_quad.setSelBackColor(FXRGB(220,220,220))
 
     # The list for the texels
-    @list_texel = FXList.new(self,nil,0,LAYOUT_FILL|LIST_SINGLESELECT)
+    @list_texel = FXList.new(self,nil,0,LAYOUT_FILL)
+    @list_texel.setSelBackColor(FXRGB(220,220,220))
 
     # The array that contrains every vertex.
     # It's coupled with the lists so that
@@ -85,20 +86,30 @@ class Lister < FXHorizontalFrame
   # - We communicate the selection plane with the Texturer
   #   so that the user can assign the texture with the right
   #   shape.
-  def on_command(sender,sel,data) 
+
+  def on_command(sender,sel,data)
+
     @selection_index = data/4
 
-    # We show the selected quad on the FXList for quads.
-    (4*@selection_index..4*@selection_index+3).each do |index|
-            #puts index
-            #@list_quad.getItemAt(index).selected = true
+    (0...@array_vertex.length).each do |index|
+      if index >= 4*@selection_index and index <= 4*@selection_index+3
+        @list_quad.getItem(index).setSelected(true)
+        @list_texel.getItem(index).setSelected(true)
+      else
+        @list_quad.getItem(index).setSelected(false)
+        @list_texel.getItem(index).setSelected(false)
+      end 
     end
+
+    @list_quad.recalc
+    @list_texel.recalc
 
     # We update the selection plane...
     @selection_plane.p1 = @array_vertex[4*@selection_index]
     @selection_plane.p2 = @array_vertex[4*@selection_index+1]
     @selection_plane.p3 = @array_vertex[4*@selection_index+2]
     @selection_plane.p4 = @array_vertex[4*@selection_index+3]
+
   end
 
   def send_selection_plane()
