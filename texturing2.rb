@@ -122,6 +122,8 @@ class TextureSelector < FXHorizontalFrame
     # The window is shown whenever we double click the image/accept it.
     @texWindow = TexWindow.new(self)
 
+    @selection_plane = nil
+
   end
 
   def on_accept(sender,sel,data)
@@ -161,6 +163,10 @@ class TextureSelector < FXHorizontalFrame
 
   def onCmdItemSelected(sender,sel,data)
     puts "BOUGNADERE"
+  end
+
+  def receive_selection_plane(plane)
+    @selection_plane = plane
   end
 
 end

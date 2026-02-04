@@ -6,10 +6,16 @@ include Fox
 
 class Controler < FXVerticalFrame
 
+  attr_reader :lister, :texture_selector
+
   def initialize(parent)
     super(parent,:opts=>LAYOUT_FILL|PACK_UNIFORM_HEIGHT)
     @lister = Lister.new(self)
     @texture_selector = TextureSelector.new(self)
+  end
+
+  def on_receiving_selection_plane(plane)
+    @texture_selector.receive_selection_plane(plane)
   end
 
 end

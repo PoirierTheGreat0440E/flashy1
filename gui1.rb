@@ -65,6 +65,10 @@ class Fenetre_principale < FXMainWindow
   def on_receiving_array_from_visuals(array)
     puts "RECEIVING ARRAY FROM VISUALS :"
     puts array
+    @control_zone.lister.process_incoming_vertices_array(array)
+  end
+
+  def on_receiving_selection_plane_from_lister(plane)
   end
 
 
