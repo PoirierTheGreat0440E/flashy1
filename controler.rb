@@ -25,8 +25,8 @@ end
 
 
 
-application = FXApp.new("Controler DEMO")
-mainWindow = MainWindow.new(application)
-application.create
-mainWindow.show
-application.run
+#application = FXApp.new("Controler DEMO")
+#mainWindow = MainWindow.new(application)
+#application.create
+#mainWindow.show
+#application.run

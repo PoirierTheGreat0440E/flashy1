@@ -1,7 +1,7 @@
 require 'fox16'
 load '3d_calc.rb'
 load '3d_visual.rb'
-load 'controls.rb'
+load 'controler.rb'
 include Fox
 
 class Fenetre_principale < FXMainWindow
@@ -26,7 +26,7 @@ class Fenetre_principale < FXMainWindow
     @visuals = Canvas3D.new(@application,@zone1)
 
     # On the right, the control zone.
-    @control_zone = ControlZone.new(@center,LAYOUT_FILL|FRAME_LINE)
+    @control_zone = Controler.new(@center)
 
     @center.setSplit(0,300)
 
@@ -60,16 +60,13 @@ class Fenetre_principale < FXMainWindow
     self.update
   end
 
-  # Gets called when the FXList of the control zone received keyboard presses...
-  def process_keys(camera,cursor) 
-    @visuals.set_camera_coordinates(camera)
-    @visuals.set_cursor_coordinates(cursor)
-    @visuals.recalc
+  # When it receives the vertex array from the visuals,
+  # it does this.
+  def on_receiving_array_from_visuals(array)
+    puts "RECEIVING ARRAY FROM VISUALS :"
+    puts array
   end
 
-  def process_vertex_manip(list)
-    @visuals.set_vertices_array(list)
-  end
 
 end
 
