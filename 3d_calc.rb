@@ -185,37 +185,34 @@ class Plane
     @p2 = point2
     @p3 = point3
     @p4 = point4
-    @length_1_to_2 = Vector.new(@p1,@p2).length
-    @length_2_to_3 = Vector.new(@p2,@p3).length
-    @length_3_to_4 = Vector.new(@p3,@p4).length
-    @length_4_to_1 = Vector.new(@p4,@p1).length
+    @vec12 = Vector.new(@p1,@p2)
+    @vec23 = Vector.new(@p2,@p3)
+    @vec34 = Vector.new(@p3,@p4)
+    @vec41 = Vector.new(@p4,@p1)
   end
 
   def p1=(new_p1)
     @p1 = new_p1
-    self.update_lengths
+    @vec12 = Vector.new(@p1,@p2)
+    @vec41 = Vector.new(@p4,@p1)
   end
 
   def p2=(new_p2)
     @p2 = new_p2
-    self.update_lengths
+    @vec12 = Vector.new(@p1,@p2)
+    @vec23 = Vector.new(@p2,@p3)
   end
 
   def p3=(new_p3)
     @p3 = new_p3
-    self.update_lengths
+    @vec23 = Vector.new(@p2,@p3)
+    @vec34 = Vector.new(@p3,@p4)
   end
 
   def p4=(new_p4)
     @p4 = new_p4
-    self.update_lengths
-  end
-
-  def update_lengths()
-    @length_1_to_2 = Vector.new(@p1,@p2).length
-    @length_2_to_3 = Vector.new(@p2,@p3).length
-    @length_3_to_4 = Vector.new(@p3,@p4).length
-    @length_4_to_1 = Vector.new(@p4,@p1).length
+    @vec34 = Vector.new(@p3,@p4)
+    @vec41 = Vector.new(@p4,@p1)
   end
 
 

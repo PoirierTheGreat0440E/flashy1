@@ -120,10 +120,9 @@ class Lister < FXHorizontalFrame
       @selection_plane.p2 = @array_vertex[4*@selection_index+1]
       @selection_plane.p3 = @array_vertex[4*@selection_index+2]
       @selection_plane.p4 = @array_vertex[4*@selection_index+3]
-      self.send_selection_plane(@selection_plane)
+      self.send_selection_plane()
     else
       puts "The plane cannot be computed !"
-      @selection_plane = nil
     end
 
   end

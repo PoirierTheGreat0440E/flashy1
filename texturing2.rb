@@ -34,7 +34,7 @@ end
 
 class TexViewer < FXCanvas
 
-  attr_reader :texture
+  attr_reader :texture, :selection_plane
   
   def initialize(parent,application)
     super(parent,:opts=>LAYOUT_FILL)
@@ -46,6 +46,7 @@ class TexViewer < FXCanvas
     load_image("apple.jpeg",1024,1024)
     @cursor_positions = [0,0]
     @point_list = Array.new()
+    @selection_plane = nil
   end
 
   def place_grid_cell(dc,x,y)
@@ -91,6 +92,24 @@ class TexViewer < FXCanvas
     @point_list.push([data.win_x,data.win_y])
   end
 
+  def compute_selection_plane_coordinates()
+    coordinates = []
+    unit = 50
+    if @selection_plane 
+      # The first point of the plane will be put at the cursor.
+      coordinates.push( [@cursor_positions[0],@cursor_positions[1]] )
+      # The second point (p2)
+      x_move = Math.sqrt(@selection_plane.vec12.x_component**2 + @selection_plane.vec12.z_component**2)
+      y_move = @selection_plane.vec12.y_component
+      sign_x = (@selection_plane.vec12.x_component)/(@selection_plane.vec12.x_component.abs)
+      sign_y = (@selection_plane.vec12.y_component)/(@selection_plane.vec12.y_component.abs)
+      #self.place_grid_cell(dc,@cursor_positions[0]+(sign_x*unit*x_move),@cursor_positions[1]+(sign_y*unit*y_move))
+      coordinates.push( [@cursor_positions[0]+(sign_x*unit*x_move) , @cursor_positions[1]+(sign_y*unit*y_move)] )
+      # The third point (p2)
+      # The fourth point (p4)
+    end
+  end
+
 end
 
 
@@ -127,7 +146,6 @@ class TextureSelector < FXHorizontalFrame
   end
 
   def on_accept(sender,sel,data)
-    puts "what???"
     @preview_image = self.load_preview_image(@file_selector.filename)
     self.paint
     @texWindow.show_yourself(@file_selector.filename)
@@ -135,7 +153,6 @@ class TextureSelector < FXHorizontalFrame
   end
 
   def on_cancel(sender,sel,data)
-    puts "ayo..."
   end
 
   def on_paint(sender,sel,data)
@@ -162,7 +179,6 @@ class TextureSelector < FXHorizontalFrame
   end
 
   def onCmdItemSelected(sender,sel,data)
-    puts "BOUGNADERE"
   end
 
   def receive_selection_plane(plane)
