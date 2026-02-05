@@ -41,12 +41,12 @@ class TexViewer < FXCanvas
     self.connect(SEL_PAINT,method(:on_paint))
     self.connect(SEL_MOTION,method(:on_motion))
     self.connect(SEL_LEFTBUTTONPRESS,method(:on_leftbuttonpress))
+    self.connect(SEL_RIGHTBUTTONPRESS,method(:on_rightbuttonpress))
     @cell_size = 1
     @image = nil
     load_image("apple.jpeg",1024,1024)
     @cursor_positions = [0,0]
-    @point_list = Array.new()
-    @selection_plane = nil
+    @texel_coordinates = { :coords => [ [0,0],[0,0],[0,0],[0,0] ] , :index => 0 }
   end
 
   def place_grid_cell(dc,x,y)
@@ -62,9 +62,7 @@ class TexViewer < FXCanvas
       dc.fillRectangle(0,0,self.width,self.height)
       dc.drawImage(@image,0,0)
       self.place_grid_cell(dc,@cursor_positions[0],@cursor_positions[1])
-      @point_list.each do |point|
-        self.place_grid_cell(dc,point[0],point[1])
-      end
+      self.display_texel_coordinates(dc)
     end 
   end
   
@@ -85,28 +83,21 @@ class TexViewer < FXCanvas
 
   def on_motion(sender,sel,data)
     @cursor_positions = [ data.win_x , data.win_y ]
-    puts @cursor_positions.to_s
   end
 
   def on_leftbuttonpress(sender,sel,data)
-    @point_list.push([data.win_x,data.win_y])
+    @texel_coordinates[:coords][@texel_coordinates[:index]] = @cursor_positions
+    @texel_coordinates[:index] = (@texel_coordinates[:index] + 1)%4
   end
 
-  def compute_selection_plane_coordinates()
-    coordinates = []
-    unit = 50
-    if @selection_plane 
-      # The first point of the plane will be put at the cursor.
-      coordinates.push( [@cursor_positions[0],@cursor_positions[1]] )
-      # The second point (p2)
-      x_move = Math.sqrt(@selection_plane.vec12.x_component**2 + @selection_plane.vec12.z_component**2)
-      y_move = @selection_plane.vec12.y_component
-      sign_x = (@selection_plane.vec12.x_component)/(@selection_plane.vec12.x_component.abs)
-      sign_y = (@selection_plane.vec12.y_component)/(@selection_plane.vec12.y_component.abs)
-      #self.place_grid_cell(dc,@cursor_positions[0]+(sign_x*unit*x_move),@cursor_positions[1]+(sign_y*unit*y_move))
-      coordinates.push( [@cursor_positions[0]+(sign_x*unit*x_move) , @cursor_positions[1]+(sign_y*unit*y_move)] )
-      # The third point (p2)
-      # The fourth point (p4)
+  def on_rightbuttonpress(sender,sel,data)
+    @texel_coordinates[:coords] = [ [0,0],[0,0],[0,0],[0,0] ]
+    @texel_coordinates[:index] = 0
+  end
+
+  def display_texel_coordinates(dc)
+    @texel_coordinates[:coords].each do |item|
+      self.place_grid_cell(dc,item[0],item[1])
     end
   end
 

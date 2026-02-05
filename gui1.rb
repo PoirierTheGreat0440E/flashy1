@@ -77,6 +77,7 @@ end
 application = FXApp.new
 fenetre = Fenetre_principale.new(application) 
 application.addTimeout(100,:repeat=>true) { fenetre.update }
+application.addTimeout(100,:repeat=>true) { fenetre.control_zone.texture_selector.texWindow.texviewer.paint }
 application.create
 fenetre.show
 application.run
