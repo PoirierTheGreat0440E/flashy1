@@ -51,8 +51,8 @@ class Lister < FXHorizontalFrame
     # they are automatically updated whenever
     # a vertex is inserted.
     @array_vertex = []
-
     @array_texel = []
+
   end
 
   # Refreshes all the lists of the Lister
@@ -66,7 +66,7 @@ class Lister < FXHorizontalFrame
     @array_vertex.each_with_index do |item,indexus|
       @list_vertex.appendItem(item.to_s,@@icon_vertex)
       @list_quad.appendItem((index/4).to_s,@@icon_quad)
-      @list_texel.appendItem(@array_texel[indexus],@@icon_texel)
+      @list_texel.appendItem(@array_texel[indexus].to_s,@@icon_texel)
       index = index + 1
     end
   end
@@ -114,21 +114,6 @@ class Lister < FXHorizontalFrame
     @list_quad.recalc
     @list_texel.recalc
 
-    # We update the selection plane...
-    if @array_vertex[4*@selection_index..4*@selection_index+3].length == 4
-      @selection_plane.p1 = @array_vertex[4*@selection_index]
-      @selection_plane.p2 = @array_vertex[4*@selection_index+1]
-      @selection_plane.p3 = @array_vertex[4*@selection_index+2]
-      @selection_plane.p4 = @array_vertex[4*@selection_index+3]
-      self.send_selection_plane()
-    else
-      puts "The plane cannot be computed !"
-    end
-
-  end
-
-  def send_selection_plane()
-    self.getParent().on_receiving_selection_plane(@selection_plane)
   end
 
   def process_incoming_vertices_array(array)
@@ -136,6 +121,15 @@ class Lister < FXHorizontalFrame
     array.each do |item|
       self.add_vertex(item)
     end
+  end
+
+  def on_receiving_texel_coordinates(coords)
+    i = 0
+    (4*@selection_index..4*@selection_index+3).each do |index|
+      @array_texel[index] = coords[i]
+      i += 1
+    end
+    self.refresh_lists()
   end
 
 end

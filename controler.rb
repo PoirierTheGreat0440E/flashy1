@@ -14,8 +14,8 @@ class Controler < FXVerticalFrame
     @texture_selector = TextureSelector.new(self)
   end
 
-  def on_receiving_selection_plane(plane)
-    @texture_selector.receive_selection_plane(plane)
+  def on_receiving_texel_coordinates(coords)
+    @lister.on_receiving_texel_coordinates(coords)
   end
 
 end

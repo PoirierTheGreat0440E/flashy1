@@ -8,11 +8,14 @@ class TexWindow < FXTopWindow
 
   attr_reader :pecker, :texviewer
 
-  def initialize(parent)
-    super(parent,"Texture1",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024,0,0,0,0,0,0)
+  def initialize(owner)
+
+    super(owner,"TexWindow",nil,nil,DECOR_TITLE|DECOR_CLOSE,10,10,1024,1024,5,5,5,5,10,10)
+    
     self.connect(SEL_CLOSE,method(:on_close))
     @pecker = FXPacker.new(self,LAYOUT_FILL)
-    @texviewer = TexViewer.new(@pecker,self.getApp)
+    #@texviewer = TexViewer.new(@pecker,self.getApp)
+    @texviewer = TexViewer.new(@pecker)
   end
 
   def show_yourself(image_path)
@@ -27,6 +30,10 @@ class TexWindow < FXTopWindow
   def painting()
       @texviewer.paint
   end
+  
+  def react(coords)
+    getOwner().getParent().on_receiving_texel_coordinates(coords)
+  end
 
 end
 
@@ -36,7 +43,7 @@ class TexViewer < FXCanvas
 
   attr_reader :texture, :selection_plane
   
-  def initialize(parent,application)
+  def initialize(parent)
     super(parent,:opts=>LAYOUT_FILL)
     self.connect(SEL_PAINT,method(:on_paint))
     self.connect(SEL_MOTION,method(:on_motion))
@@ -88,11 +95,14 @@ class TexViewer < FXCanvas
   def on_leftbuttonpress(sender,sel,data)
     @texel_coordinates[:coords][@texel_coordinates[:index]] = @cursor_positions
     @texel_coordinates[:index] = (@texel_coordinates[:index] + 1)%4
+    puts self.getShell().react(@texel_coordinates[:coords])
+    #self.getParent().getParent().communicate_tex_coords(@texel_coordinates[:coords])
   end
 
   def on_rightbuttonpress(sender,sel,data)
     @texel_coordinates[:coords] = [ [0,0],[0,0],[0,0],[0,0] ]
     @texel_coordinates[:index] = 0
+    puts self.getShell().react(@texel_coordinates[:coords])
   end
 
   def display_texel_coordinates(dc)
@@ -169,11 +179,8 @@ class TextureSelector < FXHorizontalFrame
     end
   end
 
-  def onCmdItemSelected(sender,sel,data)
-  end
-
-  def receive_selection_plane(plane)
-    @selection_plane = plane
+  def communicate_tex_coords(coords)
+    self.getParent().on_receiving_texel_coordinates(coords)
   end
 
 end
